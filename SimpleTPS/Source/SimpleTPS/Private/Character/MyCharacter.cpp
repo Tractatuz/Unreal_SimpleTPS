@@ -4,6 +4,7 @@
 #include "Character/MyCharacter.h"
 #include "Character/MyAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -18,14 +19,51 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetCharacterMovement()->JumpZVelocity = 500.0f;
+	GetCharacterMovement()->JumpZVelocity = 350.0f;
+
 	animInstance = ::Cast<UMyAnimInstance>(this->GetMesh()->GetAnimInstance());
+
+	cameraArm = ::Cast<USpringArmComponent>(this->GetComponentByClass(USpringArmComponent::StaticClass()));
 }
 
 // Called every frame
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (animInstance != nullptr)
+	{
+		animInstance->isJump = GetCharacterMovement()->IsFalling();
+		animInstance->velocity = GetVelocity().Size();
+
+		if (cameraArm != nullptr)
+		{
+			if (animInstance->isAim)
+			{
+				if (cameraArm->TargetArmLength < aimCameraArmLength 
+					|| abs(cameraArm->TargetArmLength - aimCameraArmLength) < aimSpeed * DeltaTime)
+				{
+					cameraArm->TargetArmLength = aimCameraArmLength;
+				}
+				else
+				{
+					cameraArm->TargetArmLength -= aimSpeed * DeltaTime;
+				}
+			}
+			else
+			{
+				if (cameraArm->TargetArmLength > idleCameraArmLength 
+					|| abs(cameraArm->TargetArmLength - idleCameraArmLength) < aimSpeed * DeltaTime)
+				{
+					cameraArm->TargetArmLength = idleCameraArmLength;
+				}
+				else
+				{
+					cameraArm->TargetArmLength += aimSpeed * DeltaTime;
+				}
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -34,8 +72,9 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyCharacter::Jump);
-	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AMyCharacter::Attack);
 	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AMyCharacter::Interaction);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMyCharacter::IdleToAim);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMyCharacter::AimToIdle);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -65,9 +104,20 @@ void AMyCharacter::Jump()
 	GetCharacterMovement()->DoJump(true);
 }
 
-void AMyCharacter::Attack()
+void AMyCharacter::IdleToAim()
 {
-	animInstance->isAttack = true;
+	if (animInstance != nullptr)
+	{
+		animInstance->isAim = true;
+	}
+}
+
+void AMyCharacter::AimToIdle()
+{
+	if (animInstance != nullptr)
+	{
+		animInstance->isAim = false;
+	}
 }
 
 void AMyCharacter::Interaction()

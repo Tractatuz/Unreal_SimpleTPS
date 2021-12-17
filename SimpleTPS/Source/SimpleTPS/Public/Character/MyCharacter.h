@@ -28,15 +28,23 @@ public:
 
 public:
 	class UMyAnimInstance* animInstance;
+	class USpringArmComponent* cameraArm;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float moveSpeed = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float aimSpeed = 200.f;
 
 public:
 	void MoveForward(float InputValue);
 	void MoveRight(float InputValue);
 	void Jump();
-	void Attack();
+	void IdleToAim();
+	void AimToIdle();
 	void Interaction();
 
+private:
+	const float idleCameraArmLength = 225.f;
+	const float aimCameraArmLength = 45.f;
 };

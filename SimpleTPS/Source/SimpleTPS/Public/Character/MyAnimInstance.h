@@ -15,5 +15,15 @@ class SIMPLETPS_API UMyAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
-	bool isAttack = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float velocity = 0.f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool isAim = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool isJump = false;
+	
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	//bool isCrouch = false;
 };

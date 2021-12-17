@@ -1,9 +1,9 @@
 # Unreal_SimpleTPS
-
-Developed with Unreal Engine 4.27.2
+- Simple Third Person Shooter Game Project To Study Unreal Engine
+- Developed with Unreal Engine 4.27.2
 
 ## Feature
 - N/A
 
 ## Notice
-The AnimationPack (Content/AnimStarterPack) is licensed for use with Unreal Engine only and it belongs to Epic Games. For more information visit https://www.unrealengine.com/marketplace/en-US/slug/animation-starter-pack
+The AnimationPack (Content/AnimStarterPack) And StarterContent(Content/StarterContent) is licensed for use with Unreal Engine only and it belongs to Epic Games.

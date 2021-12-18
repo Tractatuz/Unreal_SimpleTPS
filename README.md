@@ -6,4 +6,4 @@
 - N/A
 
 ## Notice
-The AnimationPack (Content/AnimStarterPack) And StarterContent(Content/StarterContent) is licensed for use with Unreal Engine only and it belongs to Epic Games.
+Some Assets(AnimStarterPack, FPWeapon, StarterContent) Belong To Epic Games And Licensed For Use With Unreal Engine Only.

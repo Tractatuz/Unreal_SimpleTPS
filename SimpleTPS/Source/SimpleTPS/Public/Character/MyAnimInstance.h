@@ -24,6 +24,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool isJump = false;
 	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	//bool isCrouch = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool isCrouch = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool isSprint = false;
 };

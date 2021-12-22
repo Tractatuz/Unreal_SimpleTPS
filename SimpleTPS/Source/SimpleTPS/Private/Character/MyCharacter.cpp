@@ -24,6 +24,8 @@ void AMyCharacter::BeginPlay()
 	animInstance = ::Cast<UMyAnimInstance>(this->GetMesh()->GetAnimInstance());
 
 	cameraArm = ::Cast<USpringArmComponent>(this->GetComponentByClass(USpringArmComponent::StaticClass()));
+
+	moveSpeed = runMoveSpeed;
 }
 
 // Called every frame
@@ -35,6 +37,7 @@ void AMyCharacter::Tick(float DeltaTime)
 	{
 		animInstance->isJump = GetCharacterMovement()->IsFalling();
 		animInstance->velocity = GetVelocity().Size();
+		animInstance->isCrouch = GetCharacterMovement()->IsCrouching();
 
 		if (cameraArm != nullptr)
 		{
@@ -75,6 +78,10 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AMyCharacter::Interaction);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMyCharacter::IdleToAim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMyCharacter::AimToIdle);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMyCharacter::IdleToCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMyCharacter::CrouchToIdle);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMyCharacter::Sprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMyCharacter::UnSprint);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -108,6 +115,11 @@ void AMyCharacter::IdleToAim()
 {
 	if (animInstance != nullptr)
 	{
+		if (animInstance->isSprint)
+		{
+			return;
+		}
+
 		animInstance->isAim = true;
 	}
 }
@@ -117,6 +129,34 @@ void AMyCharacter::AimToIdle()
 	if (animInstance != nullptr)
 	{
 		animInstance->isAim = false;
+	}
+}
+
+void AMyCharacter::IdleToCrouch()
+{
+	Crouch();
+}
+
+void AMyCharacter::CrouchToIdle()
+{
+	UnCrouch();
+}
+
+void AMyCharacter::Sprint()
+{
+	if (animInstance != nullptr)
+	{
+		animInstance->isSprint = true;
+		moveSpeed = sprintMoveSpeed;
+	}
+}
+
+void AMyCharacter::UnSprint()
+{
+	if (animInstance != nullptr)
+	{
+		animInstance->isSprint = false;
+		moveSpeed = runMoveSpeed;
 	}
 }
 

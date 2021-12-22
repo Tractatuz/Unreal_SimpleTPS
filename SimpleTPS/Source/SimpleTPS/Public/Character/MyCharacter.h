@@ -31,7 +31,10 @@ public:
 	class USpringArmComponent* cameraArm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float moveSpeed = 1.f;
+	float runMoveSpeed = 0.75f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float sprintMoveSpeed = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float aimSpeed = 200.f;
@@ -42,9 +45,14 @@ public:
 	void Jump();
 	void IdleToAim();
 	void AimToIdle();
+	void IdleToCrouch();
+	void CrouchToIdle();
+	void Sprint();
+	void UnSprint();
 	void Interaction();
 
 private:
 	const float idleCameraArmLength = 225.f;
 	const float aimCameraArmLength = 45.f;
+	float moveSpeed;
 };

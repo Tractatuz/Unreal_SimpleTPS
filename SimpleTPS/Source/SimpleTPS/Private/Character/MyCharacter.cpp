@@ -75,6 +75,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyCharacter::Jump);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyCharacter::Fire);
 	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AMyCharacter::Interaction);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMyCharacter::IdleToAim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMyCharacter::AimToIdle);
@@ -86,6 +87,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &AMyCharacter::LookUp);
 }
 
 void AMyCharacter::MoveForward(float InputValue)
@@ -106,9 +108,38 @@ void AMyCharacter::MoveRight(float InputValue)
 	AddMovementInput(Direction, InputValue * moveSpeed);
 }
 
+void AMyCharacter::LookUp(float InputValue)
+{
+	float pitch = cameraArm->GetRelativeRotation().Pitch;
+	if ((InputValue > 0 && pitch < 45.f)
+		|| (InputValue < 0 && pitch > -45.f))
+	{
+		FRotator PitchRotation(InputValue, 0, 0);
+		cameraArm->AddRelativeRotation(PitchRotation);
+	}
+}
+
 void AMyCharacter::Jump()
 {
 	GetCharacterMovement()->DoJump(true);
+}
+
+void AMyCharacter::Fire()
+{
+	UBlueprintGeneratedClass* bullet = LoadObject<UBlueprintGeneratedClass>(nullptr, *FString("/Game/BP_Bullet.BP_Bullet_C"));
+	if (bullet)
+	{
+		if (muzzlePoint)
+		{
+			FRotator spawnRotation = muzzlePoint->GetComponentRotation();
+			FVector spawnLocation = muzzlePoint->GetComponentLocation();
+
+			if (GetWorld())
+			{
+				GetWorld()->SpawnActor<AActor>(bullet, spawnLocation, spawnRotation);
+			}
+		}
+	}
 }
 
 void AMyCharacter::IdleToAim()

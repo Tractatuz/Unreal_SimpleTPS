@@ -31,18 +31,23 @@ public:
 	class USpringArmComponent* cameraArm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float runMoveSpeed = 0.75f;
+	USceneComponent* muzzlePoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float sprintMoveSpeed = 1.f;
+	float runMoveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float aimSpeed = 200.f;
+	float sprintMoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float aimSpeed;
 
 public:
 	void MoveForward(float InputValue);
 	void MoveRight(float InputValue);
+	void LookUp(float InputValue);
 	void Jump();
+	void Fire();
 	void IdleToAim();
 	void AimToIdle();
 	void IdleToCrouch();

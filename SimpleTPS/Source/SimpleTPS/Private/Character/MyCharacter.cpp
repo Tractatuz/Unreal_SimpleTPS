@@ -38,7 +38,7 @@ void AMyCharacter::Tick(float DeltaTime)
 	if (animInstance != nullptr)
 	{
 		animInstance->velocity = FVector(GetVelocity().X, GetVelocity().Y, 0).Size();
-		animInstance->direction = CalcForwardToInputDegree(GetLastMovementInputVector());
+		animInstance->direction = CalcDirection();
 		animInstance->isJump = GetCharacterMovement()->IsFalling();
 		animInstance->isCrouch = GetCharacterMovement()->IsCrouching();
 
@@ -91,25 +91,6 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMyCharacter::LookUp);
-}
-
-float AMyCharacter::CalcForwardToInputDegree(FVector lastInputVector)
-{
-	FVector normalizedInputVector = lastInputVector;
-	normalizedInputVector.Normalize();
-
-	FRotator rotation = Controller->GetControlRotation();
-	FRotator yawRotation(0, rotation.Yaw, 0);
-	FVector forwardVector = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
-	forwardVector.Normalize();
-
-	float dot = FVector::DotProduct(forwardVector, normalizedInputVector);
-	float degree = UKismetMathLibrary::DegAcos(dot);
-
-	FVector cross = FVector::CrossProduct(forwardVector, normalizedInputVector);
-	float sign = UKismetMathLibrary::SignOfFloat(cross.Z);
-
-	return degree * sign;
 }
 
 void AMyCharacter::MoveForward(float InputValue)
@@ -215,4 +196,14 @@ void AMyCharacter::UnSprint()
 
 void AMyCharacter::Interaction()
 {
+}
+
+float AMyCharacter::CalcDirection()
+{
+	FVector velocityXY = FVector(GetVelocity().X, GetVelocity().Y, 0);
+	FRotator rotation = UKismetMathLibrary::MakeRotFromX(velocityXY);
+
+	rotation += GetActorRotation().GetInverse();
+
+	return rotation.Yaw;
 }

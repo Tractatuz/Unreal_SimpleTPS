@@ -43,7 +43,6 @@ public:
 	float aimSpeed;
 
 public:
-	float CalcForwardToInputDegree(FVector lastInputVector);
 	void MoveForward(float InputValue);
 	void MoveRight(float InputValue);
 	void LookUp(float InputValue);
@@ -56,6 +55,8 @@ public:
 	void Sprint();
 	void UnSprint();
 	void Interaction();
+
+	float CalcDirection();
 
 private:
 	const float idleCameraArmLength = 225.f;

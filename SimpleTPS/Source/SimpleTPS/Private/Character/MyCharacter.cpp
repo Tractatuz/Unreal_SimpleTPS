@@ -41,6 +41,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		animInstance->direction = CalcDirection();
 		animInstance->isJump = GetCharacterMovement()->IsFalling();
 		animInstance->isCrouch = GetCharacterMovement()->IsCrouching();
+		animInstance->pitch = cameraArm->GetRelativeRotation().Pitch;
 
 		if (cameraArm != nullptr)
 		{

@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool isSprint = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float pitch = 0.f;
 };

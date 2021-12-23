@@ -56,6 +56,7 @@ public:
 	void UnSprint();
 	void Interaction();
 
+private:
 	float CalcDirection();
 
 private:

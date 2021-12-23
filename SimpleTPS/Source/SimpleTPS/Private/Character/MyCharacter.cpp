@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
@@ -35,8 +37,9 @@ void AMyCharacter::Tick(float DeltaTime)
 
 	if (animInstance != nullptr)
 	{
+		animInstance->velocity = FVector(GetVelocity().X, GetVelocity().Y, 0).Size();
+		animInstance->direction = CalcForwardToInputDegree(GetLastMovementInputVector());
 		animInstance->isJump = GetCharacterMovement()->IsFalling();
-		animInstance->velocity = GetVelocity().Size();
 		animInstance->isCrouch = GetCharacterMovement()->IsCrouching();
 
 		if (cameraArm != nullptr)
@@ -76,13 +79,13 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyCharacter::Jump);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyCharacter::Fire);
-	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AMyCharacter::Interaction);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMyCharacter::IdleToAim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMyCharacter::AimToIdle);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMyCharacter::IdleToCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMyCharacter::CrouchToIdle);
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMyCharacter::Sprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMyCharacter::UnSprint);
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AMyCharacter::Interaction);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -90,22 +93,41 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("LookUp", this, &AMyCharacter::LookUp);
 }
 
+float AMyCharacter::CalcForwardToInputDegree(FVector lastInputVector)
+{
+	FVector normalizedInputVector = lastInputVector;
+	normalizedInputVector.Normalize();
+
+	FRotator rotation = Controller->GetControlRotation();
+	FRotator yawRotation(0, rotation.Yaw, 0);
+	FVector forwardVector = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
+	forwardVector.Normalize();
+
+	float dot = FVector::DotProduct(forwardVector, normalizedInputVector);
+	float degree = UKismetMathLibrary::DegAcos(dot);
+
+	FVector cross = FVector::CrossProduct(forwardVector, normalizedInputVector);
+	float sign = UKismetMathLibrary::SignOfFloat(cross.Z);
+
+	return degree * sign;
+}
+
 void AMyCharacter::MoveForward(float InputValue)
 {
-	FRotator Rotation = Controller->GetControlRotation();
-	FRotator YawRotation(0, Rotation.Yaw, 0);
-	FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	FRotator rotation = Controller->GetControlRotation();
+	FRotator yawRotation(0, rotation.Yaw, 0);
+	FVector direction = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
 
-	AddMovementInput(Direction, InputValue * moveSpeed);
+	AddMovementInput(direction, InputValue * moveSpeed);
 }
 
 void AMyCharacter::MoveRight(float InputValue)
 {
-	FRotator Rotation = Controller->GetControlRotation();
-	FRotator YawRotation(0, Rotation.Yaw, 0);
-	FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	FRotator rotation = Controller->GetControlRotation();
+	FRotator yawRotation(0, rotation.Yaw, 0);
+	FVector direction = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(Direction, InputValue * moveSpeed);
+	AddMovementInput(direction, InputValue * moveSpeed);
 }
 
 void AMyCharacter::LookUp(float InputValue)
@@ -126,7 +148,7 @@ void AMyCharacter::Jump()
 
 void AMyCharacter::Fire()
 {
-	UBlueprintGeneratedClass* bullet = LoadObject<UBlueprintGeneratedClass>(nullptr, *FString("/Game/BP_Bullet.BP_Bullet_C"));
+	UBlueprintGeneratedClass* bullet = LoadObject<UBlueprintGeneratedClass>(nullptr, *FString("/Game/01_BP/Object/BP_Bullet.BP_Bullet_C"));
 	if (bullet)
 	{
 		if (muzzlePoint)

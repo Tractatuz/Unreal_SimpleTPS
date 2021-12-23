@@ -43,6 +43,7 @@ public:
 	float aimSpeed;
 
 public:
+	float CalcForwardToInputDegree(FVector lastInputVector);
 	void MoveForward(float InputValue);
 	void MoveRight(float InputValue);
 	void LookUp(float InputValue);

@@ -17,6 +17,9 @@ class SIMPLETPS_API UMyAnimInstance : public UAnimInstance
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float velocity = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float direction = 0.f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool isAim = false;

@@ -34,13 +34,16 @@ public:
 	USceneComponent* muzzlePoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float runMoveSpeed;
+	float crouchMoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float walkMoveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float sprintMoveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float aimSpeed;
+	float aimCameraSpeed;
 
 public:
 	void MoveForward(float InputValue);

@@ -27,7 +27,7 @@ void AMyCharacter::BeginPlay()
 
 	cameraArm = ::Cast<USpringArmComponent>(this->GetComponentByClass(USpringArmComponent::StaticClass()));
 
-	moveSpeed = runMoveSpeed;
+	moveSpeed = walkMoveSpeed;
 }
 
 // Called every frame
@@ -48,25 +48,25 @@ void AMyCharacter::Tick(float DeltaTime)
 			if (animInstance->isAim)
 			{
 				if (cameraArm->TargetArmLength < aimCameraArmLength 
-					|| abs(cameraArm->TargetArmLength - aimCameraArmLength) < aimSpeed * DeltaTime)
+					|| abs(cameraArm->TargetArmLength - aimCameraArmLength) < aimCameraSpeed * DeltaTime)
 				{
 					cameraArm->TargetArmLength = aimCameraArmLength;
 				}
 				else
 				{
-					cameraArm->TargetArmLength -= aimSpeed * DeltaTime;
+					cameraArm->TargetArmLength -= aimCameraSpeed * DeltaTime;
 				}
 			}
 			else
 			{
 				if (cameraArm->TargetArmLength > idleCameraArmLength 
-					|| abs(cameraArm->TargetArmLength - idleCameraArmLength) < aimSpeed * DeltaTime)
+					|| abs(cameraArm->TargetArmLength - idleCameraArmLength) < aimCameraSpeed * DeltaTime)
 				{
 					cameraArm->TargetArmLength = idleCameraArmLength;
 				}
 				else
 				{
-					cameraArm->TargetArmLength += aimSpeed * DeltaTime;
+					cameraArm->TargetArmLength += aimCameraSpeed * DeltaTime;
 				}
 			}
 		}
@@ -169,11 +169,14 @@ void AMyCharacter::AimToIdle()
 
 void AMyCharacter::IdleToCrouch()
 {
+	moveSpeed = crouchMoveSpeed;
+	UnSprint();
 	Crouch();
 }
 
 void AMyCharacter::CrouchToIdle()
 {
+	moveSpeed = walkMoveSpeed;
 	UnCrouch();
 }
 
@@ -181,6 +184,11 @@ void AMyCharacter::Sprint()
 {
 	if (animInstance != nullptr)
 	{
+		if (animInstance->isCrouch)
+		{
+			return;
+		}
+
 		animInstance->isSprint = true;
 		moveSpeed = sprintMoveSpeed;
 	}
@@ -190,8 +198,11 @@ void AMyCharacter::UnSprint()
 {
 	if (animInstance != nullptr)
 	{
-		animInstance->isSprint = false;
-		moveSpeed = runMoveSpeed;
+		if (animInstance->isSprint)
+		{
+			animInstance->isSprint = false;
+			moveSpeed = walkMoveSpeed;
+		}
 	}
 }
 
